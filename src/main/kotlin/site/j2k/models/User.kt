@@ -1,6 +1,19 @@
 package site.j2k.models
 
-import kotlinx.serialization.Serializable
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.Column
 
-@Serializable
-data class User(val id: Int, val nickname: String)
+object Users : IntIdTable() {
+    var username: Column<String> = varchar("username", 25).uniqueIndex()
+    var password: Column<String> = varchar("password", 35)
+}
+
+class User(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<User>(Users)
+    val notes    by Note referrersOn Notes.user
+    var username by Users.username
+    var password by Users.password
+}
