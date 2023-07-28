@@ -2,6 +2,7 @@ package site.j2k.routers
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -14,24 +15,28 @@ import java.lang.NumberFormatException
 lateinit var notes: ICollectionService<Note>
 
 fun Route.notes() {
-    getNotes()
-    createNotes()
-    updateNotes()
-    deleteNotes()
+    route("notes/") {
+        authenticate {
+            getNotes()
+            createNotes()
+            updateNotes()
+            deleteNotes()
+        }
+    }
 }
 
 fun Route.getNotes() {
-    get("/notes") {
+    get {
         notes.getSeq()
     }
-    get("/notes/{id}") {
+    get("/{id}") {
         val id = getNoteID(call) ?: return@get
         notes.getOne(id)
     }
 }
 
 fun Route.createNotes() {
-    post("/notes") {
+    post {
         val note = call.receive<Note>()
         val id = notes.create(note)
         call.response.headers.append("Location", /*add service domain*/"/notes/$id")
@@ -40,20 +45,20 @@ fun Route.createNotes() {
 }
 
 fun Route.updateNotes() {
-    put("/notes/{id}") {
+    put("/{id}") {
         val id = getNoteID(call) ?: return@put
         val newNote = call.receive<Note>()
         notes.update(id, newNote)
         call.response.headers.append("Content-Location", "/notes/$id")
     }
-    patch("/notes/{id}") {
+    patch("/{id}") {
         val id = getNoteID(call) ?: return@patch
 
     }
 }
 
 fun Route.deleteNotes() {
-    delete("/notes/{id}") {
+    delete("/{id}") {
         val id = getNoteID(call) ?: return@delete
         if (notes.delete(id)) {
             call.respond(HttpStatusCode.NoContent)

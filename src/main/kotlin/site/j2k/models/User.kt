@@ -1,5 +1,6 @@
 package site.j2k.models
 
+import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -17,3 +18,6 @@ class User(id: EntityID<Int>) : IntEntity(id) {
     var username by Users.username
     var password by Users.password
 }
+
+@Serializable
+class UserLoginRequest(val username: String, val password: String)
