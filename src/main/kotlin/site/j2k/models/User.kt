@@ -20,4 +20,4 @@ class User(id: EntityID<Int>) : IntEntity(id) {
 }
 
 @Serializable
-class UserLoginRequest(val username: String, val password: String)
+data class UserLoginRequest(val username: String, val password: String)
