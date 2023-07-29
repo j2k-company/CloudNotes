@@ -93,6 +93,8 @@ fun Route.deleteNotes() {
             return@delete
         }
 
+        note.delete()
+
         call.respond(HttpStatusCode.NoContent)
     }
 }
