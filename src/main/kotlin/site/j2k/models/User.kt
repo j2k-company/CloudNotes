@@ -7,9 +7,12 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 
+const val USERNAME_LENGTH = 25
+const val PASSWORD_LENGTH = 35
+
 object Users : IntIdTable() {
-    var username: Column<String> = varchar("username", 25).uniqueIndex()
-    var password: Column<String> = varchar("password", 35)
+    var username: Column<String> = varchar("username", USERNAME_LENGTH).uniqueIndex()
+    var password: Column<String> = varchar("password", PASSWORD_LENGTH)
 }
 
 class User(id: EntityID<Int>) : IntEntity(id) {

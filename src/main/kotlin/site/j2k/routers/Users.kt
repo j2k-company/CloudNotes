@@ -7,13 +7,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.and
 import site.j2k.JWTFactory
-import site.j2k.models.User
-import site.j2k.models.UserLoginRequest
-import site.j2k.models.Users
+import site.j2k.models.*
 
 fun Route.users() {
     route("users") {
         login()
+        register()
     }
 }
 
@@ -34,3 +33,31 @@ fun Route.login() {
         call.respond(HttpStatusCode.OK, hashMapOf("token" to token))
     }
 }
+
+fun Route.register() {
+    post("/register") {
+        val user = call.receive<UserLoginRequest>()
+
+        val users = User.find { Users.username eq user.username }
+
+        if (isValidNewUserData(user)) {
+            call.respond(HttpStatusCode.BadRequest, "Username or password is invalid")
+            return@post
+        }
+        if (!users.empty()) {
+            call.respond(HttpStatusCode.Conflict, "User with this username already exists")
+            return@post
+        }
+
+        User.new {
+            username = user.username
+            password = user.password
+        }
+
+        call.respond(HttpStatusCode.NoContent, "Registration was successful")
+    }
+}
+
+fun isValidNewUserData(user: UserLoginRequest): Boolean =
+    !(user.username.isEmpty() || user.username.length > USERNAME_LENGTH
+            || user.password.isEmpty() || user.password.length > PASSWORD_LENGTH)
